@@ -43,15 +43,22 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
+from pathlib import Path
 
 # -----------------------------
-# Config
+# Paths / Config
 # -----------------------------
-USER_CSV = "user_info.csv"
-COMPANY_CSV = "company_info.csv"
 
-USER_TO_COMPANY_OUT = "user_to_company_interact.csv"
-COMPANY_TO_USER_OUT = "company_to_user_interact.csv"
+HERE = Path(__file__).resolve()
+PROJECT_ROOT = HERE.parents[1]          # .../InvestLink
+DATA_INIT = PROJECT_ROOT / "Data" / "Initialization"
+MODELS_DIR = PROJECT_ROOT / "Models"
+
+USER_CSV = DATA_INIT / "user_info.csv"
+COMPANY_CSV = DATA_INIT / "company_info.csv"
+
+USER_TO_COMPANY_OUT = DATA_INIT / "user_to_company_interact.csv"
+COMPANY_TO_USER_OUT = DATA_INIT / "company_to_user_interact.csv"
 
 NO_INTERACTION_PROB = 0.33   # 33% -> -1, no interaction
 FLIP_PROB = 0.15             # 15% flip 0<->1, on remaining labels
@@ -490,8 +497,8 @@ def main():
     user_model = train_lgbm(user_df, "user")
     company_model = train_lgbm(company_df, "company")
 
-    user_model.save_model("lgbm_user_model.txt")
-    company_model.save_model("lgbm_company_model.txt")
+    user_model.save_model(str(MODELS_DIR / "lgbm_user_model.txt"))
+    company_model.save_model(str(MODELS_DIR / "lgbm_company_model.txt"))
     print("Saved models: lgbm_user_model.txt, lgbm_company_model.txt")
 
 

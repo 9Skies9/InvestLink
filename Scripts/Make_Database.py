@@ -34,6 +34,9 @@ import os
 import sqlite3
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent     # .../InvestLink
+DATA_ROOT = ROOT / "Data"
+DATA_INIT = DATA_ROOT / "Initialization"
 DB_COMPANY_INFO = "company_info"
 DB_USER_INFO = "user_info"
 DB_COMPANY_LOGIN = "company_login"
@@ -297,17 +300,33 @@ def import_interaction_csv(conn, table, cols, path):
     return n
 
 
+
 def main():
+    
     ap = argparse.ArgumentParser(description="Create SQLite DB and load CSVs.")
-    ap.add_argument("db", help="SQLite DB path, e.g., invest.sqlite")
 
-    ap.add_argument("--company-info", default="company_info.csv")
-    ap.add_argument("--user-info", default="user_info.csv")
-    ap.add_argument("--company-login", default="company_login.csv")
-    ap.add_argument("--user-login", default="user_login.csv")
-    ap.add_argument("--user-to-company-csv", default="user_to_company_interact.csv")
-    ap.add_argument("--company-to-user-csv", default="company_to_user_interact.csv")
+    # DB path: default to Data/invest.sqlite
+    ap.add_argument(
+        "db",
+        nargs="?",
+        default=str(DATA_ROOT / "invest.sqlite"),
+        help="SQLite DB path (default: Data/invest.sqlite)",
+    )
 
+    # CSVs: default to Data/Initialization/*
+    ap.add_argument("--company-info", default=str(DATA_INIT / "company_info.csv"))
+    ap.add_argument("--user-info", default=str(DATA_INIT / "user_info.csv"))
+    ap.add_argument("--company-login", default=str(DATA_INIT / "company_login.csv"))
+    ap.add_argument("--user-login", default=str(DATA_INIT / "user_login.csv"))
+    ap.add_argument(
+        "--user-to-company-csv",
+        default=str(DATA_INIT / "user_to_company_interact.csv"),
+    )
+    ap.add_argument(
+        "--company-to-user-csv",
+        default=str(DATA_INIT / "company_to_user_interact.csv"),
+    )
+  
     ap.add_argument("--enforce-fk", action="store_true",
                     help="Enable PRAGMA foreign_keys=ON.")
     ap.add_argument("--with-history", action="store_true",
