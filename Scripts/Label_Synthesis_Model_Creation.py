@@ -53,8 +53,8 @@ COMPANY_CSV = "company_info.csv"
 USER_TO_COMPANY_OUT = "user_to_company_interact.csv"
 COMPANY_TO_USER_OUT = "company_to_user_interact.csv"
 
-NO_INTERACTION_PROB = 0.33   # 33% -> -1
-FLIP_PROB = 0.15             # 15% flip 0<->1 on remaining labels
+NO_INTERACTION_PROB = 0.33   # 33% -> -1, no interaction
+FLIP_PROB = 0.15             # 15% flip 0<->1, on remaining labels
 
 SCORE_HI = 0.6               # synthetic threshold -> 1
 SCORE_LO = 0.3               # synthetic threshold -> 0
@@ -292,6 +292,7 @@ def synthetic_scores(features: Dict[str, float]) -> Tuple[float, float]:
     pf = features["place_fit"]
     cf = features["check_fit"]
 
+    # user-to-company label
     score_user = (
         0.35 * t +
         0.25 * ind +
@@ -300,6 +301,7 @@ def synthetic_scores(features: Dict[str, float]) -> Tuple[float, float]:
         0.15 * cf
     )
 
+    # company-to-user label
     score_company = (
         0.30 * t +
         0.25 * ind +
