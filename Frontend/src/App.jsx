@@ -1,13 +1,12 @@
-import { useCallback } from "react";
 import { Briefcase, Building2, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
-  const goTo = useCallback((path) => () => {
-    window.location.href = path;
-  }, []);
+  const navigate = useNavigate();
+  const goTo = (path) => () => navigate(path);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-indigo-50">
+    <main className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-orange-50">
       {/* Navbar */}
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
         <a href="/" className="flex items-center gap-2">
@@ -59,7 +58,7 @@ export default function App() {
                 <button
                   onClick={goTo("/register/company")}
                   aria-label="Register as a startup"
-                  className="group inline-flex items-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 px-5 py-3 text-white shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="group inline-flex items-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 px-5 py-3 text-white shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-orange-400"
                 >
                   <Building2 className="h-5 w-5" aria-hidden />
                   <span>I'm a Startup</span>
@@ -72,7 +71,7 @@ export default function App() {
                 <button
                   onClick={goTo("/register/investor")}
                   aria-label="Register as an investor"
-                  className="group inline-flex items-center gap-2 rounded-2xl border border-indigo-200 bg-white px-5 py-3 text-indigo-700 shadow-sm hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="group inline-flex items-center gap-2 rounded-2xl bg-violet-600 hover:bg-violet-700 px-5 py-3 text-white shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-violet-400"
                 >
                   <Briefcase className="h-5 w-5" aria-hidden />
                   <span>I'm an Investor</span>
@@ -131,7 +130,7 @@ export default function App() {
             actionLabel="Register as Startup"
             onClick={goTo("/register/company")}
             ariaLabel="Register as a startup"
-            accent="indigo"
+            accent="orange"
           />
           <ChoiceCard
             icon={<Briefcase className="h-6 w-6" aria-hidden />}
@@ -182,14 +181,14 @@ function ChoiceCard({
   accent = "indigo",
 }) {
   const accents = {
-    indigo: {
-      ring: "focus:ring-indigo-300",
-      border: "border-indigo-100",
+    orange: {
+      ring: "focus:ring-orange-300",
+      border: "border-orange-100",
       bg: "bg-white",
       hover: "hover:shadow-md",
-      btn: "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-300",
-      text: "text-indigo-700",
-      chip: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+      btn: "bg-orange-500 hover:bg-orange-600 focus:ring-orange-300",
+      text: "text-orange-700",
+      chip: "bg-orange-50 text-orange-700 border border-orange-200",
     },
     violet: {
       ring: "focus:ring-violet-300",
