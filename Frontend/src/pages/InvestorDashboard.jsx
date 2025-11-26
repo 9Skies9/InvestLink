@@ -5,6 +5,144 @@ import {
   DollarSign, Globe, User, FileText, Sparkles
 } from "lucide-react";
 
+// Parse check size string to numeric value for positioning
+function parseCheckSize(sizeStr) {
+  if (!sizeStr) return 0;
+  const str = sizeStr.toString().toLowerCase().replace(/[,$\s]/g, '');
+  let multiplier = 1;
+  let numStr = str;
+  
+  if (str.endsWith('k')) {
+    multiplier = 1000;
+    numStr = str.slice(0, -1);
+  } else if (str.endsWith('m')) {
+    multiplier = 1000000;
+    numStr = str.slice(0, -1);
+  } else if (str.endsWith('b')) {
+    multiplier = 1000000000;
+    numStr = str.slice(0, -1);
+  }
+  
+  const num = parseFloat(numStr);
+  return isNaN(num) ? 0 : num * multiplier;
+}
+
+// Convert value to position on log scale (better for investment ranges)
+function valueToPosition(value, minVal = 1000, maxVal = 100000000) {
+  if (value <= minVal) return 0;
+  if (value >= maxVal) return 100;
+  const logMin = Math.log10(minVal);
+  const logMax = Math.log10(maxVal);
+  const logVal = Math.log10(value);
+  return ((logVal - logMin) / (logMax - logMin)) * 100;
+}
+
+function CheckSizeRange({ min, max }) {
+  const minValue = parseCheckSize(min);
+  const maxValue = parseCheckSize(max);
+  
+  // Calculate positions on the bar (log scale: $1k to $100M)
+  const minPos = valueToPosition(minValue);
+  const maxPos = valueToPosition(maxValue);
+  
+  // Scale markers for reference
+  const scaleMarkers = [
+    { label: '$1k', value: 1000 },
+    { label: '$10k', value: 10000 },
+    { label: '$100k', value: 100000 },
+    { label: '$1M', value: 1000000 },
+    { label: '$10M', value: 10000000 },
+    { label: '$100M', value: 100000000 },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {/* Range display */}
+      <div className="relative pt-1">
+        {/* Background bar */}
+        <div className="h-3 bg-slate-100 rounded-full relative overflow-visible">
+          {/* Active range */}
+          <div 
+            className="absolute h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full shadow-sm"
+            style={{ 
+              left: `${minPos}%`, 
+              width: `${Math.max(maxPos - minPos, 2)}%` 
+            }}
+          />
+          
+          {/* Min marker */}
+          <div 
+            className="absolute -top-1 transform -translate-x-1/2"
+            style={{ left: `${minPos}%` }}
+          >
+            <div className="w-5 h-5 bg-white border-2 border-violet-500 rounded-full shadow-md" />
+          </div>
+          
+          {/* Max marker */}
+          <div 
+            className="absolute -top-1 transform -translate-x-1/2"
+            style={{ left: `${maxPos}%` }}
+          >
+            <div className="w-5 h-5 bg-white border-2 border-purple-500 rounded-full shadow-md" />
+          </div>
+        </div>
+        
+        {/* Labels above markers */}
+        <div className="relative h-8 mt-2">
+          {/* Min label */}
+          <div 
+            className="absolute transform -translate-x-1/2 text-center"
+            style={{ left: `${minPos}%` }}
+          >
+            <span className="text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-200">
+              {min || '-'}
+            </span>
+          </div>
+          
+          {/* Max label */}
+          <div 
+            className="absolute transform -translate-x-1/2 text-center"
+            style={{ left: `${maxPos}%` }}
+          >
+            <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
+              {max || '-'}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Scale reference */}
+      <div className="relative h-4 mt-4">
+        <div className="absolute inset-x-0 top-0 h-px bg-slate-200" />
+        {scaleMarkers.map((marker, i) => {
+          const pos = valueToPosition(marker.value);
+          return (
+            <div 
+              key={i}
+              className="absolute transform -translate-x-1/2"
+              style={{ left: `${pos}%` }}
+            >
+              <div className="w-px h-2 bg-slate-300" />
+              <span className="text-[10px] text-slate-400 mt-1 block whitespace-nowrap">
+                {marker.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      
+      {/* Summary text */}
+      <div className="text-center pt-2">
+        <span className="text-sm text-slate-600">
+          Investing <span className="font-semibold text-violet-600">{min || '-'}</span>
+          {' '}<span className="text-slate-400">to</span>{' '}
+          <span className="font-semibold text-purple-600">{max || '-'}</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function InvestorDashboard() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -235,21 +373,9 @@ export default function InvestorDashboard() {
             <div className="rounded-2xl border border-violet-100 bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-violet-500" />
-                Check Size
+                Check Size Range
               </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Minimum</span>
-                  <span className="font-semibold text-slate-900">{profile?.check_size_min || '-'}</span>
-                </div>
-                <div className="h-2 bg-violet-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-violet-500 to-purple-500 w-1/2 rounded-full" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Maximum</span>
-                  <span className="font-semibold text-slate-900">{profile?.check_size_max || '-'}</span>
-                </div>
-              </div>
+              <CheckSizeRange min={profile?.check_size_min} max={profile?.check_size_max} />
             </div>
 
             {/* Quick Stats */}
