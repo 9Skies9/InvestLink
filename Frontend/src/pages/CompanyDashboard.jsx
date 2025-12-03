@@ -2,39 +2,51 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { 
   Building2, LogOut, MapPin, Target, Briefcase, 
-  DollarSign, Globe, FileText, Sparkles, TrendingUp
+  DollarSign, Globe, FileText, Sparkles, TrendingUp, Link2, User, History, Search, Pencil
 } from "lucide-react";
+import SwipeRecommendations from "../components/SwipeRecommendations";
+import InteractionHistory from "../components/InteractionHistory";
+import SearchBar from "../components/SearchBar";
+import EditProfileModal from "../components/EditProfileModal";
 
 export default function CompanyDashboard() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const companyId = searchParams.get("id");
+  const tabParam = searchParams.get("tab");
   
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState(tabParam || "profile"); // "profile" | "discover" | "history" | "search"
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Update URL when tab changes
+  const changeTab = (tab) => {
+    setActiveTab(tab);
+    setSearchParams({ id: companyId, tab: tab });
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/company/${companyId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+      const data = await response.json();
+      setProfile(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!companyId) {
       navigate("/login");
       return;
     }
-
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/company/${companyId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile");
-        }
-        const data = await response.json();
-        setProfile(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProfile();
   }, [companyId, navigate]);
 
@@ -78,7 +90,7 @@ export default function CompanyDashboard() {
       <nav className="border-b border-orange-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <a href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-xl bg-indigo-600 text-white grid place-items-center font-bold">
+            <div className="h-8 w-8 rounded-xl bg-slate-900 text-white grid place-items-center font-bold">
               IL
             </div>
             <span className="font-semibold tracking-tight text-slate-900">
@@ -117,8 +129,58 @@ export default function CompanyDashboard() {
           <p className="mt-1 text-slate-600">
             Manage your company profile and connect with investors.
           </p>
+          
+          {/* Tab Navigation */}
+          <div className="flex gap-1 mt-6 p-1 bg-slate-100 rounded-xl w-fit">
+            <button
+              onClick={() => changeTab("profile")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "profile"
+                  ? "bg-white text-orange-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Building2 className="h-4 w-4" />
+              Company Profile
+            </button>
+            <button
+              onClick={() => changeTab("discover")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "discover"
+                  ? "bg-white text-orange-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Link2 className="h-4 w-4" />
+              Link Investors
+            </button>
+            <button
+              onClick={() => changeTab("history")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "history"
+                  ? "bg-white text-orange-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <History className="h-4 w-4" />
+              My Matches
+            </button>
+            <button
+              onClick={() => changeTab("search")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "search"
+                  ? "bg-white text-orange-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Search className="h-4 w-4" />
+              Search
+            </button>
+          </div>
         </div>
 
+        {/* Profile Tab Content */}
+        {activeTab === "profile" && (
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Profile Card */}
           <div className="lg:col-span-2 space-y-6">
@@ -137,7 +199,16 @@ export default function CompanyDashboard() {
                   </div>
                 )}
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-slate-900">{profile?.name}</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-slate-900">{profile?.name}</h2>
+                    <button
+                      onClick={() => setShowEditModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-orange-600 hover:bg-orange-50 transition-colors"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </button>
+                  </div>
                   <div className="flex items-center gap-3 mt-2">
                     {profile?.link && (
                       <a 
@@ -255,18 +326,81 @@ export default function CompanyDashboard() {
               </div>
             </div>
 
-            {/* Coming Soon */}
-            <div className="rounded-2xl border border-dashed border-orange-200 bg-orange-50/50 p-6">
-              <h3 className="text-sm font-semibold text-orange-900 mb-2">
-                🚀 Coming Soon
-              </h3>
-              <p className="text-xs text-orange-700">
-                Investor matching, pitch deck uploads, and meeting scheduling are on the way!
-              </p>
-            </div>
           </div>
         </div>
+        )}
+
+        {/* Discover Tab Content */}
+        {activeTab === "discover" && (
+          <div className="max-w-lg mx-auto">
+            <div className="rounded-2xl border border-orange-100 bg-white p-6 shadow-sm">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-slate-900">Link Investors</h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  Swipe right to connect, left to pass
+                </p>
+              </div>
+              <SwipeRecommendations 
+                type="company" 
+                userId={parseInt(companyId)} 
+                accentColor="orange" 
+              />
+            </div>
+          </div>
+        )}
+
+        {/* History Tab Content */}
+        {activeTab === "history" && (
+          <div className="max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-orange-100 bg-white p-6 shadow-sm">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-slate-900">My Matches</h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  View and manage your investor interactions
+                </p>
+              </div>
+              <InteractionHistory 
+                type="company" 
+                userId={parseInt(companyId)} 
+                accentColor="orange" 
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Search Tab Content */}
+        {activeTab === "search" && (
+          <div className="max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-orange-100 bg-white p-6 shadow-sm">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-slate-900">Search Investors</h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  Find investors by name, industry, or description
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <SearchBar 
+                  searchType="investors" 
+                  accentColor="orange"
+                  viewerId={parseInt(companyId)}
+                  viewerType="company"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <EditProfileModal
+          type="company"
+          profile={profile}
+          onClose={() => setShowEditModal(false)}
+          onSave={fetchProfile}
+          accentColor="orange"
+        />
+      )}
 
       {/* Footer */}
       <footer className="border-t bg-white mt-12">

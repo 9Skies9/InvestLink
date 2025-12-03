@@ -277,7 +277,7 @@ export default function InvestorSignUp() {
       {/* Navbar */}
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
         <a href="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-xl bg-indigo-600 text-white grid place-items-center font-bold">
+          <div className="h-8 w-8 rounded-xl bg-slate-900 text-white grid place-items-center font-bold">
             IL
           </div>
           <span className="font-semibold tracking-tight text-slate-900">

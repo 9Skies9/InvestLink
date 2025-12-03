@@ -201,11 +201,11 @@ def load_investors_from_csv(path: str) -> Dict[int, InvestorProfile]:
     """
     Adjust column names here to match your user_info.csv.
     Assumed columns:
-      - 'id'
+      - 'U_id'
       - 'U_name'
-      - 'U_desc'
-      - 'U_industries'        (comma-separated)
-      - 'U_stages'            (comma-separated)
+      - 'U_invest_requirements'
+      - 'U_industry'          (comma-separated)
+      - 'U_fund_stage'        (comma-separated)
       - 'U_places'            (comma-separated)
       - 'U_check size min'
       - 'U_check size max'
@@ -213,9 +213,9 @@ def load_investors_from_csv(path: str) -> Dict[int, InvestorProfile]:
     df = pd.read_csv(path)
     investors: Dict[int, InvestorProfile] = {}
     for _, row in df.iterrows():
-        uid = int(row["id"])
-        industries = [s.strip() for s in str(row.get("U_industries", "")).split(",") if s.strip()]
-        stages = [s.strip() for s in str(row.get("U_stages", "")).split(",") if s.strip()]
+        uid = int(row["U_id"])
+        industries = [s.strip() for s in str(row.get("U_industry", "")).split(",") if s.strip()]
+        stages = [s.strip() for s in str(row.get("U_fund_stage", "")).split(",") if s.strip()]
         places = [s.strip() for s in str(row.get("U_places", "")).split(",") if s.strip()]
 
         check_min = parse_money(row.get("U_check size min"))
@@ -224,7 +224,7 @@ def load_investors_from_csv(path: str) -> Dict[int, InvestorProfile]:
         investors[uid] = InvestorProfile(
             id=uid,
             name=str(row.get("U_name", uid)),
-            desc=str(row.get("U_desc", "")),
+            desc=str(row.get("U_invest_requirements", "")),
             industries=industries,
             stages=stages,
             places=places,
@@ -238,19 +238,19 @@ def load_companies_from_csv(path: str) -> Dict[int, CompanyProfile]:
     """
     Adjust column names here to match your company_info.csv.
     Assumed columns:
-      - 'id'
+      - 'C_id'
       - 'C_name'
       - 'C_desc'
-      - 'C_industries' (comma-separated)
-      - 'C_stage'
+      - 'C_industry'      (comma-separated)
+      - 'C_funding_stage'
       - 'C_place'
       - 'C_fund_size'
     """
     df = pd.read_csv(path)
     companies: Dict[int, CompanyProfile] = {}
     for _, row in df.iterrows():
-        cid = int(row["id"])
-        industries = [s.strip() for s in str(row.get("C_industries", "")).split(",") if s.strip()]
+        cid = int(row["C_id"])
+        industries = [s.strip() for s in str(row.get("C_industry", "")).split(",") if s.strip()]
         fund = parse_money(row.get("C_fund_size"))
 
         companies[cid] = CompanyProfile(
@@ -258,7 +258,7 @@ def load_companies_from_csv(path: str) -> Dict[int, CompanyProfile]:
             name=str(row.get("C_name", cid)),
             desc=str(row.get("C_desc", "")),
             industries=industries,
-            stage=str(row.get("C_stage", "")),
+            stage=str(row.get("C_funding_stage", "")),
             place=str(row.get("C_place", "")),
             fund_size=fund,
         )

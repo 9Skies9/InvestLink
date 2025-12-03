@@ -6,11 +6,11 @@ export default function App() {
   const goTo = (path) => () => navigate(path);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-orange-50">
+    <main className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-orange-50">
       {/* Navbar */}
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
         <a href="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-xl bg-indigo-600 text-white grid place-items-center font-bold">
+          <div className="h-8 w-8 rounded-xl bg-slate-900 text-white grid place-items-center font-bold">
             IL
           </div>
           <span className="font-semibold tracking-tight text-slate-900">
@@ -29,7 +29,7 @@ export default function App() {
           </a>
           <a
             href="/login"
-            className="rounded-xl border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
           >
             Sign in
           </a>

@@ -8,6 +8,8 @@ import CompanySignUp from './pages/CompanySignUp.jsx'
 import SignIn from './pages/SignIn.jsx'
 import InvestorDashboard from './pages/InvestorDashboard.jsx'
 import CompanyDashboard from './pages/CompanyDashboard.jsx'
+import InvestorProfile from './pages/InvestorProfile.jsx'
+import CompanyProfile from './pages/CompanyProfile.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -19,6 +21,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<SignIn />} />
         <Route path="/dashboard/investor" element={<InvestorDashboard />} />
         <Route path="/dashboard/company" element={<CompanyDashboard />} />
+        <Route path="/profile/investor/:id" element={<InvestorProfile />} />
+        <Route path="/profile/company/:id" element={<CompanyProfile />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
